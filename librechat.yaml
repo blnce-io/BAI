@@ -130,7 +130,8 @@ actions:
 endpoints:
   bedrock:
     streamRate: 35
-    titleModel: 'anthropic.claude-3-haiku-20240307-v1:0'
+    titleModel: 'arn:aws:bedrock:us-east-2:223287545160:inference-profile/us.anthropic.claude-3-haiku-20240307-v1:0'
+
     availableRegions:
       - 'us-east-2'
 
