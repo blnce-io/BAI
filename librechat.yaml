@@ -11,13 +11,13 @@ cache: true
 interface:
   endpointsMenu: false
   modelSelect: false
-  parameters: true
-  sidePanel: true
+  parameters: false
+  sidePanel: false
   presets: false
   prompts: false
   bookmarks: false
   multiConvo: false
-  agents: true
+  agents: false
 
 # Example Registration Object Structure (optional)
 registration:
@@ -30,7 +30,7 @@ modelSpecs:
   prioritize: true
   list:
     - name: 'claude-3-haiku-balance'
-      label: 'Balance Assistant'
+      label: 'Flower'
       default: true
       description: 'Balance aware assistant'
       preset:
