@@ -31,6 +31,7 @@ pipeline {
                         script {
                             sh """
                               cd charts
+                              helm dependency build librechat
                               helm upgrade bai librechat --install
                             """
                         }
