@@ -12,9 +12,9 @@ interface:
   endpointsMenu: false
   modelSelect: false
   parameters: false
-  sidePanel: false
+  sidePanel: true
   presets: false
-  prompts: false
+  prompts: true
   bookmarks: false
   multiConvo: false
   agents: false
