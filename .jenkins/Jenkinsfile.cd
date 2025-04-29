@@ -1,11 +1,5 @@
 pipeline {
-    agent {
-        kubernetes {
-            cloud "k8s-agents"
-            serviceAccount "jenkins-k8s-jobs"
-            inheritFrom "jnlp-aws-helm"
-        }
-    }
+    agent any
     options {
         lock("bai-cd")
         disableConcurrentBuilds() 
