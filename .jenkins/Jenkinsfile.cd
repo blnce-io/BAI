@@ -30,12 +30,11 @@ pipeline {
                             ]]
                         ])
                         docker.withRegistry("https://${ECR_REGISTRY}", "ecr:${REGION}:${ECR_SECRET_ID}") {
-                            def image = docker.build("${IMAGE_NAME}:master-${env.BUILD_NUMBER}-dev",
-                                "--target=development\
-                                --build-arg UID=`id -u`\
-                                --build-arg GID=`id -g`\
-                                -f Dockerfile .")
-                            image.push("master-${env.BUILD_NUMBER}-dev")
+                            docker.build(IMAGE_NAME)
+                            sh """
+                            docker tag ${IMAGE_NAME} ${ECR_REGISTRY}/${IMAGE_NAME}
+                            docker push ${ECR_REGISTRY}/${IMAGE_NAME}
+                            """
                         }
                     }
                 }
