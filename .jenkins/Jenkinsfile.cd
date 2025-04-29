@@ -33,13 +33,25 @@ pipeline {
             }
         }
         stage('Deploy BAI to Management') {
+            agent {
+                kubernetes {
+                    cloud "k8s-agents"
+                    serviceAccount "jenkins-k8s-jobs"
+                    inheritFrom "jnlp-aws-helm"
+                }
+            }
             steps {
-                sh """
-                    cd charts
-                    helm repo add bitnami https://charts.bitnami.com/bitnami
-                    helm dependency build librechat
-                    helm upgrade bai librechat --install -n default
-                """
+                container("jnlp") {
+                    sh """
+                        cd charts
+                        helm repo add bitnami https://charts.bitnami.com/bitnami
+                        helm dependency build librechat
+                        helm upgrade bai librechat --install -n default
+                        aws eks --region us-east-2 update-kubeconfig --name balance-management
+                        kubectl config use-context arn:aws:eks:us-east-2:223287545160:cluster/balance-management
+                        kubectl rollout restart deployment -n default bai-librechat
+                    """
+                }
             }
         }
     }
