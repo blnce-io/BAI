@@ -10,22 +10,46 @@ pipeline {
         lock("bai-cd")
         disableConcurrentBuilds() 
     }
+    environment {
+        DOCKER_BUILDKIT = 1
+        ECR_REGISTRY = '223287545160.dkr.ecr.us-east-2.amazonaws.com'
+        REGION = 'us-east-2'
+        ECR_SECRET_ID = "ecr-login"
+        IMAGE_NAME = 'devops:bai'
+    }
     stages {
-        stage('Deploy BAI to Management') {
-            stages {
-                stage('Deploy') {
-                    steps {
-                      container('jnlp') {
-                        script {
-                            sh """
-                              cd charts
-                              helm repo add bitnami https://charts.bitnami.com/bitnami
-                              helm dependency build librechat
-                              helm upgrade bai librechat --install -n default
-                            """
+        stage('Build and Upload image to ECR') {
+            steps {
+                container('jnlp') {
+                    script {
+                        checkout([$class: 'GitSCM', 
+                            branches: [[name: 'master']], 
+                            userRemoteConfigs: [[
+                                credentialsId: 'devops-getbalance-github-repo-token',
+                                url: 'https://github.com/blnce-io/BAI.git'
+                            ]]
+                        ])
+                        docker.withRegistry("https://${ECR_REGISTRY}", "ecr:${REGION}:${ECR_SECRET_ID}") {
+                            def image = docker.build("${IMAGE_NAME}:master-${env.BUILD_NUMBER}-dev",
+                                "--target=development\
+                                --build-arg UID=`id -u`\
+                                --build-arg GID=`id -g`\
+                                -f Dockerfile .")
+                            image.push("master-${env.BUILD_NUMBER}-dev")
                         }
                     }
-                  }
+                }
+            }
+        }
+        stage('Deploy BAI to Management') {
+            steps {
+                container('jnlp') {
+                    sh """
+                        cd charts
+                        helm repo add bitnami https://charts.bitnami.com/bitnami
+                        helm dependency build librechat
+                        helm upgrade bai librechat --install -n default
+                    """
                 }
             }
         }
