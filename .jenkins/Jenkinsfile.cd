@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        label 'small-machine'
-    }
+    agent any
     options {
         lock("bai-cd")
         disableConcurrentBuilds() 
