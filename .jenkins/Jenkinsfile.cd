@@ -16,36 +16,32 @@ pipeline {
     stages {
         stage('Build and Upload image to ECR') {
             steps {
-                container('jnlp') {
-                    script {
-                        checkout([$class: 'GitSCM', 
-                            branches: [[name: 'master']], 
-                            userRemoteConfigs: [[
-                                credentialsId: 'devops-getbalance-github-repo-token',
-                                url: 'https://github.com/blnce-io/BAI.git'
-                            ]]
-                        ])
-                        docker.withRegistry("https://${ECR_REGISTRY}", "ecr:${REGION}:${ECR_SECRET_ID}") {
-                            docker.build(IMAGE_NAME)
-                            sh """
-                            docker tag ${IMAGE_NAME} ${ECR_REGISTRY}/${IMAGE_NAME}
-                            docker push ${ECR_REGISTRY}/${IMAGE_NAME}
-                            """
-                        }
-                    }
-                }
+              script {
+                  checkout([$class: 'GitSCM', 
+                      branches: [[name: 'master']], 
+                      userRemoteConfigs: [[
+                          credentialsId: 'devops-getbalance-github-repo-token',
+                          url: 'https://github.com/blnce-io/BAI.git'
+                      ]]
+                  ])
+                  docker.withRegistry("https://${ECR_REGISTRY}", "ecr:${REGION}:${ECR_SECRET_ID}") {
+                      docker.build(IMAGE_NAME)
+                      sh """
+                      docker tag ${IMAGE_NAME} ${ECR_REGISTRY}/${IMAGE_NAME}
+                      docker push ${ECR_REGISTRY}/${IMAGE_NAME}
+                      """
+                  }
+              }
             }
         }
         stage('Deploy BAI to Management') {
             steps {
-                container('jnlp') {
-                    sh """
-                        cd charts
-                        helm repo add bitnami https://charts.bitnami.com/bitnami
-                        helm dependency build librechat
-                        helm upgrade bai librechat --install -n default
-                    """
-                }
+                sh """
+                    cd charts
+                    helm repo add bitnami https://charts.bitnami.com/bitnami
+                    helm dependency build librechat
+                    helm upgrade bai librechat --install -n default
+                """
             }
         }
     }
