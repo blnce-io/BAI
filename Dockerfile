@@ -1,7 +1,9 @@
 # v0.7.8
 
+ARG docker_images_registry=docker.io
+
 # Base node image
-FROM node:20-alpine AS node
+FROM ${docker_images_registry}node:20-alpine AS node
 
 # Install jemalloc
 RUN apk add --no-cache jemalloc
