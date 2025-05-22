@@ -4,7 +4,7 @@ ARG node_version=22.13.0
 ARG docker_images_registry=docker.io
 
 # Base node image
-FROM ${docker_images_registry}node:${node_version}-alpine AS node
+FROM ${docker_images_registry}/node:${node_version}-alpine AS node
 
 # Install jemalloc
 RUN apk add --no-cache jemalloc
