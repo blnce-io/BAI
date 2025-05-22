@@ -24,6 +24,12 @@ WORKDIR /app
 USER node
 
 COPY --chown=node:node package.json .
+COPY --chown=node:node api/package.json api/package.json
+COPY --chown=node:node client/package.json client/package.json
+COPY --chown=node:node packages/mcp/package.json packages/mcp/package.json
+COPY --chown=node:node packages/data-schemas/package.json packages/data-schemas/package.json
+COPY --chown=node:node packages/data-provider/package.json packages/data-provider/package.json
+COPY --chown=node:node packages/data-provider/react-query/package.json packages/data-provider/react-query/package.json
 COPY --chown=node:node package-lock.json .
 RUN \
   npm config set fetch-retry-maxtimeout 600000 ; \
