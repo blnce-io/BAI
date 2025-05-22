@@ -23,7 +23,7 @@ pipeline {
                       ]]
                   ])
                   docker.withRegistry("https://${ECR_REGISTRY}", "ecr:${REGION}:${ECR_SECRET_ID}") {
-                      docker.build(IMAGE_NAME)
+                      docker.build(IMAGE_NAME, "--build-arg docker_images_registry=${ECR_REGISTRY}")
                       sh """
                       docker tag ${IMAGE_NAME} ${ECR_REGISTRY}/${IMAGE_NAME}
                       docker push ${ECR_REGISTRY}/${IMAGE_NAME}
