@@ -1,0 +1,69 @@
+pipeline {
+    agent any
+    options {
+        buildDiscarder(logRotator(daysToKeepStr: "10"))
+        timeout(time: 1, unit: 'HOURS')
+        parallelsAlwaysFailFast()
+    }
+    environment {
+        REPO_NAME = 'BAI'
+        DOCKER_IMAGE_NAME = 'bai'
+        BRANCH_NAME = "${GIT_BRANCH.split('/').size() > 2 ? GIT_BRANCH.split('/')[1..-1].join('-') : GIT_BRANCH.split('/').join('-')}"
+        ECR_REGISTRY = '223287545160.dkr.ecr.us-east-2.amazonaws.com'
+        DOCKER_BUILDKIT = 1
+        DOCKER_WORKDIR = '/app'
+        REGION = 'us-east-2'
+        ECR_SECRET_ID = "ecr-login"
+        GITHUB = credentials('devops-getbalance-github-repo-token')
+        AWS_DEFAULT_REGION = "us-east-2"
+
+    }
+    stages {
+        stage('Check agent machine type') {
+            steps { script { getAgentInfo() } }
+        }
+        stage('Clone repository') {
+            steps {
+                script {
+                    cancelPreviousBuilds()
+                    deleteDir()
+                    checkout scm
+                }
+            }
+        }
+        stage('Build Docker & Setup Test Env') {
+            parallel {
+                stage('Build Docker') {
+                    steps {
+                        script {
+                            docker.withRegistry("https://${ECR_REGISTRY}", "ecr:${REGION}:${ECR_SECRET_ID}") {
+                                dev = docker.build(
+                                  "${DOCKER_IMAGE_NAME}:${BRANCH_NAME}-${env.BUILD_NUMBER}-dev",
+                                  "--build-arg docker_images_registry=${ECR_REGISTRY} ."
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    post {
+        cleanup {
+            cleanWs()
+            cleanMachineIfFull()
+        }
+    }
+}
+
+def getAgentInfo() {
+    sh """
+        TOKEN=\$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+        echo
+        curl --no-progress-meter -H "X-aws-ec2-metadata-token: \$TOKEN" http://169.254.169.254/latest/meta-data/instance-id
+        echo
+        curl --no-progress-meter -H "X-aws-ec2-metadata-token: \$TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4
+        echo
+        curl --no-progress-meter -H "X-aws-ec2-metadata-token: \$TOKEN" http://169.254.169.254/latest/meta-data/instance-type
+    """
+}
