@@ -59,7 +59,7 @@ modelSpecs:
         model: 'arn:aws:bedrock:us-east-2:223287545160:inference-profile/us.anthropic.claude-3-7-sonnet-20250219-v1:0'
         maxContextTokens: 200000 # Maximum context tokens
         max_tokens: 8192 # Maximum output tokens
-        temperature: 0.5
+        temperature: 1
         modelLabel: 'Balance Clever Assistant'
         greeting: |
           Balance infrastructure aware assistant
