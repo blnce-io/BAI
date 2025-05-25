@@ -17,7 +17,7 @@ interface:
   prompts: true
   bookmarks: false
   multiConvo: false
-  agents: false
+  agents: true
 
 # Example Registration Object Structure (optional)
 registration:
