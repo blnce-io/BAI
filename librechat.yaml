@@ -140,6 +140,9 @@ mcpServers:
 
 # Definition of custom endpoints
 endpoints:
+  agents:
+    disableBuilder: false
+    capabilities: ['tools']
   bedrock:
     streamRate: 35
     titleModel: 'arn:aws:bedrock:us-east-2:223287545160:inference-profile/us.anthropic.claude-3-haiku-20240307-v1:0'
