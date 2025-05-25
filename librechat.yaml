@@ -141,7 +141,7 @@ mcpServers:
 # Definition of custom endpoints
 endpoints:
   agents:
-    disableBuilder: false
+    disableBuilder: true
     capabilities: ['tools']
   bedrock:
     streamRate: 35
